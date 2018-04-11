@@ -1,14 +1,15 @@
 import docker
 import os
 import multiprocessing
-from config import DOCKER_IMAGE, MEMORY_LIMIT, AUTO_REMOVE, FILE_OPEN_MODE, BASE_DIR, CONTAINER_TIMEOUT
+from config import DOCKER_IMAGE, MEMORY_LIMIT, AUTO_REMOVE, FILE_OPEN_MODE, LOCAL_DIR, CONTAINER_TIMEOUT,
+CONTAINER_DIR
 
 
-def __run_code(client, directory_where_file_is_located, file_name, container_name, return_dict):
+def __run_code(client, file_name, container_name, return_dict):
     try:
         python_run_command = 'python ' + str(file_name)
-        local_directory = str(directory_where_file_is_located) + '/' + str(file_name)
-        container_directory = '/data/' + str(file_name)
+        local_directory = LOCAL_DIR + '/' + str(file_name)
+        container_directory = CONTAINER_DIR + str(file_name)
 
         if not os.path.exists(local_directory):
             raise Exception('File not found : ' + str(local_directory))
@@ -36,7 +37,7 @@ def run_code(file_name, container_name):
     manager = multiprocessing.Manager()
     return_dict = manager.dict()
     process = multiprocessing.Process(target=__run_code, 
-                                    args=(client, BASE_DIR, file_name, container_name, return_dict))
+                                    args=(client, file_name, container_name, return_dict))
     process.start()
     process.join(CONTAINER_TIMEOUT)
     if process.is_alive():
