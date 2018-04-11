@@ -1,19 +1,13 @@
 import docker
 import os
 import multiprocessing
-from config import DOCKER_IMAGE, MEMORY_LIMIT, AUTO_REMOVE, FILE_OPEN_MODE
+from config import DOCKER_IMAGE, MEMORY_LIMIT, AUTO_REMOVE, FILE_OPEN_MODE, BASE_DIR, CONTAINER_TIMEOUT
 
-class InfiniteLoopException(Exception):
-    pass
-
-def handler(signum, frame):
-    raise InfiniteLoopException("Infinte loop detected.")
 
 def __run_code(client, directory_where_file_is_located, file_name, container_name, return_dict):
     try:
         python_run_command = 'python ' + str(file_name)
-        local_directory = str(
-            directory_where_file_is_located) + '/' + str(file_name)
+        local_directory = str(directory_where_file_is_located) + '/' + str(file_name)
         container_directory = '/data/' + str(file_name)
 
         if not os.path.exists(local_directory):
@@ -28,39 +22,30 @@ def __run_code(client, directory_where_file_is_located, file_name, container_nam
                                                 })
         return_dict['result'] = result
     except docker.errors.ContainerError as e:
-        return_dict['result'] = e
-    except InfiniteLoopException as e:
-        print e
-        a = client.containers.list(filters={'name': container_name})
-        if a:
-            print 'stopping the container'
-            a[0].stop()
-            print 'removing the container'
-            a[0].remove()
-
-        return_dict['result'] = 'The code took more time than required. Hence the process was killed.'
+        try:
+            pretty_message = str(e.message).split('Traceback (most recent call last):')[1]
+            return_dict['result'] = pretty_message
+        except:
+            return_dict['result'] = e.message
     except Exception as e:
-        return_dict['result'] = e
-        return False
+        return_dict['result'] = e.message
 
-def run_code():
+
+def run_code(file_name, container_name):
     client = docker.from_env()
-    container_name = 'run'
     manager = multiprocessing.Manager()
     return_dict = manager.dict()
-    p = multiprocessing.Process(target=__run_code, args=(client, '/home/ankur/Documents/Projects/Docker/compiler/temp', 'one.py', 
-                                                        container_name, return_dict))
-    p.start()
-    p.join(5)
-    if p.is_alive():
-        print "running... let's kill it..."
-        p.terminate()
-        p.join()
-        a = client.containers.list(filters={'name': container_name})
-        if a:
-            print 'stopping the container'
-            # a[0].stop()
-            print 'removing the container'
-            a[0].remove(force=True)
+    process = multiprocessing.Process(target=__run_code, 
+                                    args=(client, BASE_DIR, file_name, container_name, return_dict))
+    process.start()
+    process.join(CONTAINER_TIMEOUT)
+    if process.is_alive():
+        process.terminate()
+        process.join()
+        running_containers = client.containers.list(filters={'name': container_name})
+        if running_containers:
+            running_containers[0].remove(force=True)
+
+        return_dict['result'] = 'Time limit Exceeded'
 
     return return_dict
