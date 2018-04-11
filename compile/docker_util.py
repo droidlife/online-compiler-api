@@ -1,6 +1,6 @@
 import docker
 import os
-import signal
+import multiprocessing
 from config import DOCKER_IMAGE, MEMORY_LIMIT, AUTO_REMOVE, FILE_OPEN_MODE
 
 class InfiniteLoopException(Exception):
@@ -9,7 +9,7 @@ class InfiniteLoopException(Exception):
 def handler(signum, frame):
     raise InfiniteLoopException("Infinte loop detected.")
 
-def __run_code(client, directory_where_file_is_located, file_name, container_name):
+def __run_code(client, directory_where_file_is_located, file_name, container_name, return_dict):
     try:
         python_run_command = 'python ' + str(file_name)
         local_directory = str(
@@ -26,9 +26,9 @@ def __run_code(client, directory_where_file_is_located, file_name, container_nam
                                                 'bind': container_directory,
                                                 'mode': FILE_OPEN_MODE}
                                                 })
-        return result
+        return_dict['result'] = result
     except docker.errors.ContainerError as e:
-        return e
+        return_dict['result'] = e
     except InfiniteLoopException as e:
         print e
         a = client.containers.list(filters={'name': container_name})
@@ -38,16 +38,29 @@ def __run_code(client, directory_where_file_is_located, file_name, container_nam
             print 'removing the container'
             a[0].remove()
 
-        return 'The code took more time than required. Hence the process was killed.'
+        return_dict['result'] = 'The code took more time than required. Hence the process was killed.'
     except Exception as e:
-        print e
+        return_dict['result'] = e
         return False
 
 def run_code():
     client = docker.from_env()
     container_name = 'run'
-    signal.signal(signal.SIGALRM, handler)
-    signal.alarm(5)
-    output =  __run_code(client, '/home/ankur/Documents/Projects/Docker/compiler/temp', 'one.py', container_name)
-    signal.alarm(0)
-    return output
+    manager = multiprocessing.Manager()
+    return_dict = manager.dict()
+    p = multiprocessing.Process(target=__run_code, args=(client, '/home/ankur/Documents/Projects/Docker/compiler/temp', 'one.py', 
+                                                        container_name, return_dict))
+    p.start()
+    p.join(5)
+    if p.is_alive():
+        print "running... let's kill it..."
+        p.terminate()
+        p.join()
+        a = client.containers.list(filters={'name': container_name})
+        if a:
+            print 'stopping the container'
+            # a[0].stop()
+            print 'removing the container'
+            a[0].remove(force=True)
+
+    return return_dict
