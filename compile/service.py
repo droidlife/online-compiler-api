@@ -2,8 +2,8 @@ from compile.util.python_compiler import python_runner
 
 commands = {
     'python': {
-        2: 'python ',
-        3: 'python3 '
+        2: 'python',
+        3: 'python3'
     }
 }
 

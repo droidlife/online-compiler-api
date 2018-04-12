@@ -11,7 +11,7 @@ def run_code(code, language, version):
     return_dict = manager.dict()
 
     result, command_string = get_command(language, version)
-
+    
     if not result:
         return_dict['result'] = command_string 
         return return_dict
@@ -28,7 +28,7 @@ def run_code(code, language, version):
         
 
     process = multiprocessing.Process(target=target_method, 
-                                    args=(client, file_name, container_name, return_dict))
+                                    args=(client, file_name, container_name, command_string, return_dict))
     process.start()
     process.join(CONTAINER_TIMEOUT)
     if process.is_alive():

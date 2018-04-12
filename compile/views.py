@@ -9,8 +9,8 @@ class CompileCodeView(APIView):
 
     def post(self, request):
         code = request.data['code']
-        language = 'python'
-        version = 2
+        language = request.data['language']
+        version = int(request.data['version'])
         output = run_code(code, language, version)
         result = output['result'] if 'result' in output else ''
 

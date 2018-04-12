@@ -3,9 +3,9 @@ import os
 from config import DOCKER_IMAGE, MEMORY_LIMIT, AUTO_REMOVE, FILE_OPEN_MODE, LOCAL_DIR, CONTAINER_DIR
 
 
-def python_runner(client, file_name, container_name, return_dict):
+def python_runner(client, file_name, container_name, command, return_dict):
     try:
-        python_run_command = 'python ' + str(file_name)
+        python_run_command = command + ' ' + str(file_name)
         local_directory = LOCAL_DIR + '/' + str(file_name)
         container_directory = CONTAINER_DIR + '/' + str(file_name)
 
