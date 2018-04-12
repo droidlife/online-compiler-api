@@ -32,11 +32,11 @@ def run_code(code, language, version):
     if process.is_alive():
         process.terminate()
         process.join()
-        running_containers = client.containers.list(filters={'name': container_name})
-        if running_containers:
-            running_containers[0].remove(force=True)
-
         return_dict['result'] = 'Time limit Exceeded'
+
+    running_containers = client.containers.list(filters={'name': container_name})
+    if running_containers:
+        running_containers[0].remove(force=True)
 
     os.remove(file_path)
     return return_dict
