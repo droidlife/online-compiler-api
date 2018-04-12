@@ -1,15 +1,13 @@
 import docker
 import os
-import multiprocessing
-from config import DOCKER_IMAGE, MEMORY_LIMIT, AUTO_REMOVE, FILE_OPEN_MODE, LOCAL_DIR, CONTAINER_TIMEOUT,
-CONTAINER_DIR
+from config import DOCKER_IMAGE, MEMORY_LIMIT, AUTO_REMOVE, FILE_OPEN_MODE, LOCAL_DIR, CONTAINER_DIR
 
 
-def __run_code(client, file_name, container_name, return_dict):
+def python_runner(client, file_name, container_name, return_dict):
     try:
         python_run_command = 'python ' + str(file_name)
         local_directory = LOCAL_DIR + '/' + str(file_name)
-        container_directory = CONTAINER_DIR + str(file_name)
+        container_directory = CONTAINER_DIR + '/' + str(file_name)
 
         if not os.path.exists(local_directory):
             raise Exception('File not found : ' + str(local_directory))
@@ -30,23 +28,3 @@ def __run_code(client, file_name, container_name, return_dict):
             return_dict['result'] = e.message
     except Exception as e:
         return_dict['result'] = e.message
-
-
-def run_code(file_name, container_name):
-    client = docker.from_env()
-    manager = multiprocessing.Manager()
-    return_dict = manager.dict()
-    process = multiprocessing.Process(target=__run_code, 
-                                    args=(client, file_name, container_name, return_dict))
-    process.start()
-    process.join(CONTAINER_TIMEOUT)
-    if process.is_alive():
-        process.terminate()
-        process.join()
-        running_containers = client.containers.list(filters={'name': container_name})
-        if running_containers:
-            running_containers[0].remove(force=True)
-
-        return_dict['result'] = 'Time limit Exceeded'
-
-    return return_dict
