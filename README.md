@@ -28,9 +28,12 @@ Just a simple POST call with form data is enough to compile the code and get the
 3. Go to the root of the code directory where the Dockerfile is located and build the docker image by running <br>
   `docker build -t <image_name> .`
   
-4. Open config.py and set the base parameters: <br>
+4. Open config.py and set the base parameters:
+
    * <b>DOCKER_IMAGE</b> :  The name of the docker image created
    * <b>LOCAL_DIR</b> : The path of the local directory needed to save the code.
 
+# Execution
 
-  
+1. Run the django development server by running the command<br>
+   `python manage.py runserver`
