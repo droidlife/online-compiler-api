@@ -25,8 +25,6 @@ def run_code(code, language, version):
 
     
     target_method = get_target_method(language)
-        
-
     process = multiprocessing.Process(target=target_method, 
                                     args=(client, file_name, container_name, command_string, return_dict))
     process.start()
