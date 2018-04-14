@@ -1,5 +1,5 @@
 # ----------------------  BASE PARAMETERS ---------------------- #
-DOCKER_IMAGE = 'ankur/python'
+DOCKER_IMAGE = 'ankur/compiler'
 LOCAL_DIR = '/home/ankur/Documents/Projects/Docker/compiler/temp'
 
 # ----------------------  ADDITIONAL PARAMETERS ---------------------- #

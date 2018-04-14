@@ -37,3 +37,8 @@ Just a simple POST call with form data is enough to compile the code and get the
 
 1. Run the django development server by running the command<br>
    `python manage.py runserver`
+
+2. Make a post api call to `http://localhost:8000/compile/code` with following parameters as form-data:
+   * code : print "hello world"
+   * language : 'python'
+   * version : 2
