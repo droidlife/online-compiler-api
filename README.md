@@ -11,7 +11,6 @@ Just a simple POST call with form data is enough to compile the code and get the
 1. Python 2 <br>
 2. Python 3 <br>
 3. Java 8
-.... More are on the way
 
 # Requirements
 * Python (2.x, 3.x)
