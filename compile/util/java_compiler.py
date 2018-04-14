@@ -1,4 +1,3 @@
-import docker
 import os
 from config import DOCKER_IMAGE, LOCAL_DIR, CONTAINER_DIR
 import traceback
