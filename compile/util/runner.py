@@ -47,7 +47,7 @@ def run_code(code, language, version):
         return_dict['result'] = 'Time limit Exceeded'
     
     # check if the container is still running. if yes, kill the container
-    running_containers = client.containers.list(filters={'name': container_name})
+    running_containers = client.containers.list(filters={'name': container_name}, all=True)
     if running_containers:
         running_containers[0].remove(force=True)
 

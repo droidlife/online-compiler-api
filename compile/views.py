@@ -9,7 +9,7 @@ class CompileCodeView(APIView):
 
     def post(self, request):
         code = request.data['code']
-        language = request.data['language']
+        language = request.data['language'].strip()
         version = int(request.data['version'])
         
         output = run_code(code, language, version)
