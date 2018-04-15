@@ -17,8 +17,6 @@ def java_runner(client, file_name, container_name, command_string, return_dict):
             void_main_splitter = content.split("public static void main")
             class_splitter = void_main_splitter[0].split("class")
             psvm_class_name = class_splitter[len(class_splitter) - 1].split('{')[0].strip()
-
-            print psvm_class_name
         except:
             return_dict['result'] = "public static void main not found!"
             return
