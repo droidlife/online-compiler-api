@@ -1,21 +1,17 @@
-from compile.util.python_compiler import python_runner
-from compile.util.java_compiler import java_runner
+from compile.python_compiler import python_runner
 
 commands = {
     'python': {
         2: 'python',
         3: 'python3'
-    },
-    'java': {
-        8: 'javac'
     }
 }
 
 
 extensions = {
-    'python': '.py',
-    'java': '.java'
+    'python': '.py'
 }
+
 
 def get_command(language, version):
     if language not in commands:
@@ -30,9 +26,7 @@ def get_command(language, version):
 def get_extension(language):
     return extensions[language]
 
+
 def get_target_method(language):
     if language == 'python':
         return python_runner
-
-    elif language == 'java':
-        return java_runner
