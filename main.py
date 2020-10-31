@@ -1,13 +1,14 @@
 from flask import Flask
+from flask import request, jsonify
 from compile.runner import run_code
 app = Flask(__name__)
 
 
-@app.route('/')
+@app.route('/', methods=['POST'])
 def hello_world():
-    output = run_code("print('hello')", "python", 3)
-    print(output)
-    return 'Hello, World!'
+    json = request.get_json()
+    output = run_code(json["code"], "python", 3)
+    return jsonify(output._getvalue())
 
 
 app.run(port=8080)

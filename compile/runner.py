@@ -32,21 +32,14 @@ def run_code(code, language, version):
     # getting which compiler method will handle this request
     target_method = get_target_method(language)
 
-    print("11")
-
     # starting the docker container in separate process
     process = multiprocessing.Process(target=target_method,
                                       args=(client, file_name, container_name, command_string, return_dict))
 
-    print("22")
     process.start()
-
-    print("33")
 
     # setting the timeout for the process
     process.join(CONTAINER_TIMEOUT)
-
-    print("44")
 
     # if the process/container is still alive kill the process
     if process.is_alive():
